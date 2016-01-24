@@ -1,7 +1,9 @@
 package com.patches.wall.types;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Formatter;
 
 /**
  * Created by stri0214 on 23.01.2016.
@@ -54,6 +56,71 @@ public class UnsignedTypes {
         ans=(char) b;
         return ans;
     }
+    private static String patch="\\x02\\x00\\x00\\x80\\x01\\x00\\x00\\x01\\x00\\x18\\x00\\x64\\x69\\x76\\x78";
+    private String unpatch="\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x01\\x00\\x18\\x00\\x00\\x00\\x00\\x00";
 
+    private static String a="000000000000000100180000000000";
+    private static String b="020000800100000100180064697678";
+    public static void main(String argv[]){
+
+        RandomAccessFile patchFile = null;
+        byte[] sig=new byte[15];
+        try {
+            patchFile = new RandomAccessFile("E:\\36022.avi", "rw");
+            patchFile.seek(0xb1);
+            patchFile.readFully(sig);
+            //patchFile.close();
+            if(a.equals(byteToHex(sig))){
+                patchFile.seek(0xb1);
+                patchFile.write(asBytes(b));
+
+            }
+            System.out.println(" dsds" +byteToHex(sig));
+            //чтение
+            //проверка
+            //Запись
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (patchFile != null) {
+                try {
+                    patchFile.close();
+                } catch (IOException e) {
+
+                }
+            }
+        }
+
+    }
+
+    static String byteToHex(final byte[] hash) {
+        Formatter formatter = new Formatter();
+
+        for (byte b : hash) {
+            formatter.format("%02x", b);
+        }
+
+        String result = formatter.toString();
+        formatter.close();
+        return result;
+    }
+
+    static byte[] asBytes(String str)
+    {
+        if ((str.length() % 2) == 1) str = "0" + str; // pad leading 0 if needed
+        byte[] buf = new byte[str.length() / 2];
+        int i = 0;
+
+        for (char c : str.toCharArray())
+        {
+            byte b = Byte.parseByte(String.valueOf(c), 16);
+            buf[i/2] |= (b << (((i % 2) == 0) ? 4 : 0));
+            i++;
+        }
+
+        return buf;
+    }
 
 }
