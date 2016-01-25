@@ -1,10 +1,11 @@
 package com.patches.wall.works;
 
+import com.patches.wall.helper.PatchHelper;
 import com.patches.wall.models.FileTableModel;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 
@@ -12,7 +13,7 @@ import org.apache.log4j.Logger;
  * SwingWorker "SearcFile" find all files in current directory with sub-directories. Is is running in other thread.
  */
 
-public class SearchFile extends SwingWorker<ArrayList<File>,File> {
+public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
 
     private static final Logger log=Logger.getLogger(SearchFile.class);
 
@@ -31,22 +32,29 @@ public class SearchFile extends SwingWorker<ArrayList<File>,File> {
     }
 
     @Override
-    protected ArrayList<File> doInBackground() throws Exception {
+    protected HashMap<File,String> doInBackground() throws Exception {
 
-        log.info("SearchFile is running");
-        ArrayList<File> allFiles=new ArrayList<File>(searchFilesInDir(path));
+        log.debug("SearchFile is running");
+
+        HashMap<File,String> allFiles=new HashMap<>(searchFilesInDir(path));
+
         return allFiles;
     }
 
     @Override
     protected final void done(){
-        log.info("SearchFile was finished");
-        ArrayList<File>allFiles=new ArrayList<File>();
+
+        log.debug("SearchFile was finished");
+
+        HashMap<File,String> allFiles = new HashMap<>();
+
         try {
+
             allFiles=get();
+
             if(allFiles!=null){
-                for (File currFile : allFiles) {
-                    jTable.addRow(new Object[]{currFile.getPath(), currFile.getName()});
+                for (File currFile : allFiles.keySet()) {
+                    jTable.addRow(new Object[]{currFile.getPath(), allFiles.get(currFile)});
                 }
             }
         } catch (InterruptedException e) {
@@ -62,16 +70,24 @@ public class SearchFile extends SwingWorker<ArrayList<File>,File> {
      * @param file Current directory for search files.
      * @return Array all files in current directory with files from sub-directories.
      */
-    private ArrayList<File> searchFilesInDir(File file) {
-        ArrayList<File> allFiles = new ArrayList<File>();
+    private HashMap<File,String> searchFilesInDir(File file) {
+
+        HashMap<File,String> allFiles = new HashMap<>();
+
         for (File currFile : file.listFiles()) {
             if (!currFile.isDirectory()) {
-                allFiles.add(currFile);
+                if(PatchHelper.isPatch(currFile)){
+                   allFiles.put(currFile,"Patched");
+                } else {
+                    allFiles.put(currFile,"Original");
+                }
             }
-            else { allFiles.addAll(searchFilesInDir(currFile));
+            else {
+                allFiles.putAll(searchFilesInDir(currFile));
             }
+        }
 
-        } return allFiles;
+        return allFiles;
     }
 
     /**

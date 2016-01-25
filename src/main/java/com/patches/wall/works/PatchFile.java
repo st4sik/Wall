@@ -21,8 +21,8 @@ public class PatchFile extends SwingWorker<Boolean, Void> {
     @Override
     protected Boolean doInBackground() throws Exception {
 
-        PatchHelper patchFile=new PatchHelper(file);
-        boolean wasPatched=patchFile.patchFile();
+        //PatchHelper patchFile=new PatchHelper(file);
+        boolean wasPatched=PatchHelper.patchFile(file);
 
         return true;
     }
