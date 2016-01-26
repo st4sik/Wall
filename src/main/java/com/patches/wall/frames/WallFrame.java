@@ -2,7 +2,6 @@ package com.patches.wall.frames;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.patches.wall.dialogs.ResultDialog;
 import com.patches.wall.works.PatchFile;
 import com.patches.wall.works.SearchFile;
 import com.patches.wall.models.FileTableModel;
@@ -10,16 +9,14 @@ import com.patches.wall.models.FileTableModel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
 
-/**
- * Created by STASСтас on 1/19/2016.
- */
 public class WallFrame extends JFrame {
+
     private JPanel mainPanel;
     private JButton findButton;
     private JButton patchButton;
@@ -27,20 +24,70 @@ public class WallFrame extends JFrame {
     private JPanel workPanel;
     private JTextField textField1;
     private JTable table1;
-    private ArrayList<File> allFiles;
     private JScrollPane scrollPane;
+    private FileTableModel fileTableModel;
 
     public WallFrame() {
         super("Patch for game");
         initUI();
-
+        initListeners();
     }
 
+    private void initListeners() {
+        ListSelectionModel cellSelectionModel = table1.getSelectionModel();
+        cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        final String[] selectedFile = {null};
+
+        findButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+                int returnVal = fileChooser.showOpenDialog(WallFrame.this);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+                    cellSelectionModel.clearSelection();
+                    fileTableModel.getDataVector().removeAllElements();
+                    File file = fileChooser.getSelectedFile();
+                    textField1.setText(file.getAbsolutePath());
+
+                    new SearchFile(file, fileTableModel).execute();
+                }
+            }
+        });
+
+        cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+
+                int selectedRow = table1.getSelectedRow();
+                if (selectedRow >= 0)
+                    selectedFile[0] = table1.getValueAt(selectedRow, 0).toString();
+            }
+        });
+
+
+        patchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                File path = new File(selectedFile[0]);
+
+                new PatchFile(path).execute();
+            }
+        });
+    }
 
     private void initUI() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(mainPanel);
-        final FileTableModel fileTableModel = new FileTableModel();
+        setSize(new Dimension(415, 415));
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        fileTableModel = new FileTableModel();
         table1.setModel(fileTableModel);
         scrollPane = new JScrollPane(table1);
 
@@ -52,43 +99,7 @@ public class WallFrame extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         workPanel.add(scrollPane, gbc);
 
-        findButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int returnVal = fileChooser.showOpenDialog(WallFrame.this);
-
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    fileTableModel.getDataVector().removeAllElements();
-                    File file = fileChooser.getSelectedFile();
-
-                    textField1.setText(file.getAbsolutePath());
-                    allFiles = new ArrayList<File>();
-
-                    new SearchFile(file, fileTableModel).execute();
-
-                    //FileFindHelper.getInstance().searchAllFiles(file));
-                }
-
-            }
-        });
-
-        patchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                File path = new File("D:\\test\\1.txt");
-                new PatchFile(path).execute();
-                //ResultDialog resultDialog = new ResultDialog();
-                //resultDialog.setVisible(true);
-            }
-        });
-
-
         setVisible(true);
-
     }
 
 

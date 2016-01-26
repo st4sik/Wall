@@ -49,7 +49,6 @@ public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
         HashMap<File,String> allFiles = new HashMap<>();
 
         try {
-
             allFiles=get();
 
             if(allFiles!=null){
@@ -75,7 +74,7 @@ public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
         HashMap<File,String> allFiles = new HashMap<>();
 
         for (File currFile : file.listFiles()) {
-            if (!currFile.isDirectory()) {
+            if (!currFile.isDirectory() || currFile.getName().endsWith(".avi")) {
                 if(PatchHelper.isPatch(currFile)){
                    allFiles.put(currFile,"Patched");
                 } else {

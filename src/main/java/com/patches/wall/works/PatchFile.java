@@ -5,54 +5,53 @@ import com.patches.wall.helper.PatchHelper;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.Formatter;
 import java.util.concurrent.ExecutionException;
+import org.apache.log4j.Logger;
 
 /**
- * Created by stri0214 on 21.01.2016.
+ * SwingWorker "PatchFile" of patching a current file. It's running in other thread.
  */
+
 public class PatchFile extends SwingWorker<Boolean, Void> {
+
+    private static Logger log=Logger.getLogger(PatchFile.class);
+
     private final File file;
 
-
+    /**
+     * Constructor for SwingWorker "PatchFile"
+     * @param file a current file for patch.
+     */
     public PatchFile (File file ) {
         this.file=file;
     }
+
     @Override
     protected Boolean doInBackground() throws Exception {
 
-        //PatchHelper patchFile=new PatchHelper(file);
+        log.debug("PatchFile is running");
+
         boolean wasPatched=PatchHelper.patchFile(file);
 
-        return true;
+        return wasPatched;
     }
 
-
     @Override
-    protected final void done()
-    {
+    protected final void done() {
+
+        log.debug("PatchFile was finished");
+
         try {
             if(get()){
                 ResultDialog resultDialog=new ResultDialog(file);
                 resultDialog.setVisible(true);
+            }else{
+                //ToDo
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
-
-    private String byteToHex(final byte[] hash)
-    {
-        Formatter formatter = new Formatter();
-        for (byte b : hash)
-        {
-            formatter.format("\\x%02x", b);
-        }
-        String result = formatter.toString();
-        formatter.close();
-        return result;
-    }
-
 }
