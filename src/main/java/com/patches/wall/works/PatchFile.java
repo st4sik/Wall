@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 /**
  * SwingWorker "PatchFile" of patching a current file. It's running in other thread.
  */
-
 public class PatchFile extends SwingWorker<Boolean, Void> {
 
     private static Logger log=Logger.getLogger(PatchFile.class);

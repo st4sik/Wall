@@ -6,14 +6,14 @@ import com.patches.wall.models.FileTableModel;
 import javax.swing.*;
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 import org.apache.log4j.Logger;
 
 /**
  * SwingWorker "SearcFile" find all files in current directory with sub-directories. Is is running in other thread.
  */
-
-public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
+public class SearchFile extends SwingWorker<Map<File,String>,File> {
 
     private static final Logger log=Logger.getLogger(SearchFile.class);
 
@@ -32,11 +32,11 @@ public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
     }
 
     @Override
-    protected HashMap<File,String> doInBackground() throws Exception {
+    protected Map<File,String> doInBackground() throws Exception {
 
         log.debug("SearchFile is running");
 
-        HashMap<File,String> allFiles=new HashMap<>(searchFilesInDir(path));
+        Map<File,String> allFiles=new HashMap<File,String>(searchFilesInDir(path));
 
         return allFiles;
     }
@@ -46,7 +46,7 @@ public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
 
         log.debug("SearchFile was finished");
 
-        HashMap<File,String> allFiles = new HashMap<>();
+        Map<File,String> allFiles = new HashMap<File,String>();
 
         try {
             allFiles=get();
@@ -69,12 +69,12 @@ public class SearchFile extends SwingWorker<HashMap<File,String>,File> {
      * @param file Current directory for search files.
      * @return Array all files in current directory with files from sub-directories.
      */
-    private HashMap<File,String> searchFilesInDir(File file) {
+    private Map<File,String> searchFilesInDir(File file) {
 
-        HashMap<File,String> allFiles = new HashMap<>();
+        Map<File,String> allFiles = new HashMap<File,String>();
 
         for (File currFile : file.listFiles()) {
-            if (!currFile.isDirectory() || currFile.getName().endsWith(".avi")) {
+            if (!currFile.isDirectory()) {
                 if(PatchHelper.isPatch(currFile)){
                    allFiles.put(currFile,"Patched");
                 } else {

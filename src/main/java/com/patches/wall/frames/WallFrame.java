@@ -34,7 +34,7 @@ public class WallFrame extends JFrame {
     }
 
     private void initListeners() {
-        ListSelectionModel cellSelectionModel = table1.getSelectionModel();
+        final ListSelectionModel cellSelectionModel = table1.getSelectionModel();
         cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final String[] selectedFile = {null};
 
