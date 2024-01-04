@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+**/target/**
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# NetBeans
+nb-configuration.xml
+build/
+
+!/.mvn/wrapper/maven-wrapper.jar
+/.gradle/
+/bin/
+.sts4*
+*.iml
+.idea
