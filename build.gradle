@@ -1,33 +1,36 @@
-group 'org.security.patches'
-version '1.0-SNAPSHOT'
+version '2.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'com.patches.wall.WallMain'
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
-sourceCompatibility = 1.6
+application {
+    mainClassName = 'com.game.wall.patch.WallMain'
+}
 
 repositories {
+    mavenCentral()
     maven {
-        url  'http://repo.maven.apache.org/maven2'
+        url 'https://repo1.maven.org/maven2'
     }
 }
 
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
-        attributes 'Main-Class': 'com.patches.wall.WallMain'
+        attributes 'Main-Class': 'com.game.wall.patch.WallMain'
         attributes 'Class-Path': '../log4j.properties'
     }
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    //compile 'com.jgoodies:jgoodies-common:1.7.0'
-    //compile 'com.jgoodies:jgoodies-binding:2.10.0'
-    compile 'com.intellij:forms_rt:6.0.5'
-    compile 'log4j:log4j:1.2.17'
-    compile 'org.slf4j:slf4j-api:1.7.5'
-    compile 'org.slf4j:slf4j-log4j12:1.7.5'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    implementation group: 'com.intellij', name: 'forms_rt', version: '7.0.3'
+    implementation 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.slf4j:slf4j-api:1.7.32'
 }
